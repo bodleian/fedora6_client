@@ -12,12 +12,8 @@ module Fedora6
   class Client
     class Error < StandardError; end
 
-    def initialize(config)
-      @config = self.config(config)
-    end
-
-    def config
-      Fedora6::Client::Config.new
+    def initialize(config:nil)
+      @config = Fedora6::Client::Config.new(config)
     end
 
     def exists? (uri)

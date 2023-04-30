@@ -3,12 +3,6 @@ module Fedora6
       # Your code goes here...
       class Binary < Fedora6::Client
 
-        def initialize
-            super
-            @identifier = self.start_transaction(self.config)
-        end
-
-
         def upload(file_identifier, filename, file_path, parent_uri, transaction_uri: false)
             if exists? ("#{parent_uri}/#{file_identifier}")
                 self.update_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)

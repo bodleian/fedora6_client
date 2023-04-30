@@ -18,7 +18,7 @@ module Fedora6
         end
 
         def initialize(configuration: default_config)
-            self.config = configuration
+            @config = configuration
         end
       end
 
