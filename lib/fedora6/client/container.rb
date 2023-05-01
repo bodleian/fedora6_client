@@ -1,14 +1,7 @@
 module Fedora6
-    module Client
-      class Container < Fedora6::Client
-
-        super
+      class Client::Container < Client
 
         ARCHIVAL_GROUP="<http://fedora.info/definitions/v4/repository#ArchivalGroup>;rel=\"type\""
-
-        def initialize
-            super
-        end
 
         def create(identifier: false, archival_group: false, transaction_uri: false)
             return self.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
@@ -51,5 +44,4 @@ module Fedora6
         end
 
       end
-    end
 end

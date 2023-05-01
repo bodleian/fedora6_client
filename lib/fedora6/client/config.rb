@@ -1,8 +1,7 @@
 module Fedora6
-    module Client
       # Your code goes here...
-      class Config
-        attr_reader :default_config
+      class Client::Config
+        attr_reader :default_config, :config
         def default_config
             password = 'orapass'
             user = 'ora'
@@ -17,12 +16,11 @@ module Fedora6
             }
         end
 
-        def initialize(configuration: default_config)
-            @config = configuration
+        def initialize(configuration = nil)
+            @config = configuration || self.default_config
         end
       end
 
-    end
 end
   
  

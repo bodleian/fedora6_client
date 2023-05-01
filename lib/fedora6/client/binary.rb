@@ -1,7 +1,6 @@
 module Fedora6
-    module Client
       # Your code goes here...
-      class Binary < Fedora6::Client
+      class Client::Binary < Client
 
         def upload(file_identifier, filename, file_path, parent_uri, transaction_uri: false)
             if exists? ("#{parent_uri}/#{file_identifier}")
@@ -67,5 +66,4 @@ module Fedora6
         end
       end
 
-    end
 end

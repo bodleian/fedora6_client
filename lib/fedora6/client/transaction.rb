@@ -1,9 +1,6 @@
 module Fedora6
-    module Client
       # Your code goes here...
-      class Transaction < Fedora6::Client
-        super
-
+      class Client::Transaction < Client
         def initialize
           super
           @identifier = self.start_transaction(self.config)
@@ -65,5 +62,4 @@ module Fedora6
 
       end
 
-    end
 end
