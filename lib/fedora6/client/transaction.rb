@@ -8,28 +8,36 @@ module Fedora6
             ## Returns tx_id: the transaction id
             super
             #require 'byebug'; byebug
-            create_transaction = Client::Transaction.start_transaction(self.config)
-            validate_transaction_response(create_transaction)
-            @tx_id = create_transaction['Location']
+            response = Client::Transaction.start_transaction(self.config)
+            validate_response(response)
+            @tx_id = response['Location']
         end
 
         def get
-           return Client::Transaction.get_transaction(@config, @tx_id)
+           response = Client::Transaction.get_transaction(@config, @tx_id)
+           validate_response(response)
+           true
         end
 
         def keep_alive
-            return Client::Transaction.keep_transaction_alive(@config, @tx_id)
+            response = Client::Transaction.keep_transaction_alive(@config, @tx_id)
+            validate_response(response)
+            true
         end
 
         def commit
-            return Client::Transaction.commit_transaction(@config, @tx_id)
+            response = Client::Transaction.commit_transaction(@config, @tx_id)
+            validate_response(response)
+            true
         end
 
         def rollback
-            return Client::Transaction.rollback_transaction(@config, @tx_id)
+            response = Client::Transaction.rollback_transaction(@config, @tx_id)
+            validate_response(response)
+            true
         end
 
-        def validate_transaction_response(response)
+        def validate_response(response)
             unless["201", "204"].include? response.code
                 raise Fedora6::APIError.new(response.code, response.body)
             end

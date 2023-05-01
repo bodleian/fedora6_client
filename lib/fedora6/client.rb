@@ -12,11 +12,12 @@ module Fedora6
     class Error < StandardError; end
 
     class APIError < StandardError
-        attr_reader :code, :message
         def initialize(code, message)
-            super
-            @code = code
-            @message = message
+            if message && message != ''
+                super(msg="#{code}: #{message}")
+            else
+                super(msg="#{code}")
+            end
         end
     end
 
@@ -28,7 +29,7 @@ module Fedora6
         end
       
         def exists? (uri)
-            response = self.head(self.config, uri) 
+            response = head(self.config, uri) 
             if ['200', '204'].include? response.code
                 return true
             else
@@ -36,14 +37,20 @@ module Fedora6
             end
         end
     
-        def head(config, binary_uri)
-            url = URI.parse("#{binary_uri}/fcr:metadata")
+        def head(config, uri)
+            url = URI.parse("#{uri}")
             response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
                 req = Net::HTTP::Head.new url
                 req.basic_auth(config[:user], config[:password])
                 http.request(req)
             end
             return response
+        end
+
+        def validate_response(response)
+            unless["201", "204"].include? response.code
+                raise Fedora6::APIError.new(response.code, response.body)
+            end
         end
     end
 end
