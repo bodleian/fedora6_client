@@ -4,12 +4,14 @@ module Fedora6
         ARCHIVAL_GROUP="<http://fedora.info/definitions/v4/repository#ArchivalGroup>;rel=\"type\""
 
         def create(identifier: false, archival_group: false, transaction_uri: false)
-            return self.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
+            return Fedora6::Client::Container.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
         end
 
-        def get(uri)
-            return self.get_container(self.config, uri)
+        def get_metadata(uri)
+            return Fedora6::Client::Container.get_container(self.config, uri)
         end
+
+        # Class methods
 
         def self.get_container(config, uri) 
             url = URI.parse(uri)

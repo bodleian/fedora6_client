@@ -4,11 +4,13 @@ module Fedora6
 
         def upload(file_identifier, filename, file_path, parent_uri, transaction_uri: false)
             if exists? ("#{parent_uri}/#{file_identifier}")
-                self.update_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)
+                Fedora6::Client::Binary.update_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)
             else
-                self.create_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)
+                Fedora6::Client::Binary.create_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)
             end
         end
+
+        # Class methods
 
         def self.get_binary_metadata(config, binary_uri)
             url = URI.parse("#{binary_uri}/fcr:metadata")

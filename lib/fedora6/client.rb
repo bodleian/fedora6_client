@@ -2,7 +2,7 @@ require "net/http"
 require "uri"
 # frozen_string_literal: true
 
-require_relative "client/version"
+require_relative "client/module_version"
 require_relative 'client/config'
 require_relative 'client/binary'
 require_relative 'client/transaction'
@@ -13,21 +13,21 @@ module Fedora6
 
     class Client
         attr_reader :config
-        def initialize(config = nil)
+
+        def initialize(config=nil)
             @config = Fedora6::Client::Config.new(config).config
         end
       
-      
-          def exists? (uri)
+        def exists? (uri)
             response = self.head(self.config, uri) 
             if ['200', '204'].include? response.code
                 return true
             else
                 return false
             end
-          end
-      
-          def head(config, binary_uri)
+        end
+    
+        def head(config, binary_uri)
             url = URI.parse("#{binary_uri}/fcr:metadata")
             response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
                 req = Net::HTTP::Head.new url
@@ -35,6 +35,6 @@ module Fedora6
                 http.request(req)
             end
             return response
-          end
         end
+    end
 end
