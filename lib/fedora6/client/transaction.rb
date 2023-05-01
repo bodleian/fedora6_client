@@ -1,21 +1,30 @@
 module Fedora6
       # Your code goes here...
       class Client::Transaction < Client
-        def initialize
+
+        attr_reader :tx_id
+
+        def initialize(config = nil)
           super
-          @identifier = self.start_transaction(self.config)
+          #require 'byebug'; byebug
+          create_transaction = Client::Transaction.start_transaction(self.config)
+          if create_transaction.code == '201'
+            @tx_id = create_transaction['Location']
+          else 
+            raise Fedora6::Client::Error
+          end
         end
 
         def keep_alive
-          return self.keep_transaction_alive(@config, @identifier)
+          return Client::Transaction.keep_transaction_alive(@config, @tx_id)
         end
 
         def commit
-          return self.commit_transaction(@config, @identifier)
+          return Client::Transaction.commit_transaction(@config, @tx_id)
         end
 
         def rollback
-          return self.rollback_transaction(@config, @identifier)
+          return Client::Transaction.rollback_transaction(@config, @tx_id)
         end
 
 
@@ -28,7 +37,7 @@ module Fedora6
             req.basic_auth(config[:user], config[:password])
             http.request(req)
           end
-          return result['Location']
+          return response
         end
 
         def self.keep_transaction_alive(config, transaction_uri)

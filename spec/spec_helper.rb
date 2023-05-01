@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "fedora6/client"
+require 'webmock/rspec'
+
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -11,5 +13,13 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before(:each) do
+    ### Transaction stubs
+
+    # Create transaction
+    stub_request(:post, "https://test_transaction.com/base/fcr:tx").
+      to_return(status: 201, headers: {Location: '12345678'}, body: create_transaction_response.to_json)
   end
 end
