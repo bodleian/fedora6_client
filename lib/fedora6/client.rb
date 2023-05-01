@@ -11,6 +11,15 @@ require_relative 'client/container'
 module Fedora6
     class Error < StandardError; end
 
+    class APIError < StandardError
+        attr_reader :code, :message
+        def initialize(code, message)
+            super
+            @code = code
+            @message = message
+        end
+    end
+
     class Client
         attr_reader :config
 

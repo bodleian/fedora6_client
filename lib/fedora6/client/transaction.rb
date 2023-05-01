@@ -9,11 +9,12 @@ module Fedora6
             super
             #require 'byebug'; byebug
             create_transaction = Client::Transaction.start_transaction(self.config)
-            if create_transaction.code == '201'
-                @tx_id = create_transaction['Location']
-            else 
-                raise Fedora6::Client::Error
-            end
+            validate_transaction_response(create_transaction)
+            @tx_id = create_transaction['Location']
+        end
+
+        def get
+           return Client::Transaction.get_transaction(@config, @tx_id)
         end
 
         def keep_alive
@@ -26,6 +27,12 @@ module Fedora6
 
         def rollback
             return Client::Transaction.rollback_transaction(@config, @tx_id)
+        end
+
+        def validate_transaction_response(response)
+            unless["201", "204"].include? response.code
+                raise Fedora6::APIError.new(response.code, response.body)
+            end
         end
 
         # Class methods
@@ -41,9 +48,20 @@ module Fedora6
             return response
         end
 
-        def self.keep_transaction_alive(config, transaction_uri)
+        def self.get_transaction(config, tx_id)
+          # Returns a transaction ID
+          url = URI.parse("#{config[:base]}/fcr:tx/#{tx_id}")
+          response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
+              req = Net::HTTP::Get.new url
+              req.basic_auth(config[:user], config[:password])
+              http.request(req)
+          end
+          return response
+        end
+
+        def self.keep_transaction_alive(config, tx_id)
             # keeps a transaction that's > 3 minutes long alive
-            url = URI.parse(transaction_uri)
+            url = URI.parse("#{config[:base]}/fcr:tx/#{tx_id}")
             response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
                 req = Net::HTTP::Post.new url
                 req.basic_auth(config[:user], config[:password])
@@ -51,9 +69,9 @@ module Fedora6
             end
         end
 
-        def self.commit_transaction(config, transaction_uri)
+        def self.commit_transaction(config, tx_id)
             # keeps a transaction that's > 3 minutes long alive
-            url = URI.parse(transaction_uri)
+            url = URI.parse("#{config[:base]}/fcr:tx/#{tx_id}")
             response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
                 req = Net::HTTP::Put.new url
                 req.basic_auth(config[:user], config[:password])
@@ -61,8 +79,8 @@ module Fedora6
             end
         end
 
-        def self.rollback_transaction(config, transaction_uri)
-            url = URI.parse(transaction_uri)
+        def self.rollback_transaction(config, tx_id)
+          url = URI.parse("#{config[:base]}/fcr:tx/#{tx_id}")
             response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
                 req = Net::HTTP::Delete.new url
                 req.basic_auth(config[:user], config[:password])

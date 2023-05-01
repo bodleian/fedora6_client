@@ -16,10 +16,50 @@ RSpec.configure do |config|
     end
 
     config.before(:each) do
-    ### Transaction stubs
+        ### Transaction stubs
 
-    # Create transaction
-    stub_request(:post, "https://test_transaction.com/base/fcr:tx").
-        to_return(status: 201, headers: {Location: '12345678'}, body: nil)
+        # Create transaction
+        stub_request(:post, "https://test_transaction.com/base/fcr:tx").
+            to_return(status: 201, headers: {Location: '12345678'}, body: nil)
+        stub_request(:post, "https://test_transaction.com/missing/fcr:tx").
+            to_return(status: 201, headers: {Location: '12345678'}, body: nil)
+        stub_request(:post, "https://test_transaction.com/conflict/fcr:tx").
+            to_return(status: 201, headers: {Location: '12345678'}, body: nil)
+        stub_request(:post, "https://test_transaction.com/expired/fcr:tx").
+            to_return(status: 201, headers: {Location: '12345678'}, body: nil)
+
+        # Get transaction status
+        stub_request(:get, "https://test_transaction.com/base/fcr:tx/12345678").
+            to_return(status: 204, body: nil)
+        stub_request(:get, "https://test_transaction.com/missing/fcr:tx/12345678").
+            to_return(status: 404, body: nil)
+        stub_request(:get, "https://test_transaction.com/expired/fcr:tx/12345678").
+            to_return(status: 410, body: nil)
+
+        # Keep transaction alive
+        stub_request(:post, "https://test_transaction.com/base/fcr:tx/12345678").
+            to_return(status: 204, body: nil)
+        stub_request(:post, "https://test_transaction.com/missing/fcr:tx/12345678").
+            to_return(status: 404, body: nil)        
+        stub_request(:post, "https://test_transaction.com/expired/fcr:tx/12345678").
+            to_return(status: 410, body: nil)
+
+        # Commit transaction
+        stub_request(:put, "https://test_transaction.com/base/fcr:tx/12345678").
+            to_return(status: 204, body: nil)        
+        stub_request(:put, "https://test_transaction.com/missing/fcr:tx/12345678").
+            to_return(status: 404, body: nil)        
+        stub_request(:put, "https://test_transaction.com/conflict/fcr:tx/12345678").
+            to_return(status: 409, body: nil)        
+        stub_request(:put, "https://test_transaction.com/expired/fcr:tx/12345678").
+            to_return(status: 410, body: nil)
+
+        # Rollback transaction
+        stub_request(:delete, "https://test_transaction.com/base/fcr:tx/12345678").
+            to_return(status: 204, body: nil)
+        stub_request(:post, "https://test_transaction.com/missing/fcr:tx/12345678").
+            to_return(status: 404, body: nil)        
+        stub_request(:post, "https://test_transaction.com/expired/fcr:tx/12345678").
+            to_return(status: 410, body: nil)
     end
 end
