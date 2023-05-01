@@ -36,7 +36,7 @@ RSpec.describe Fedora6::Client::Transaction do
 
     it "returns 409 on conflict" do 
         transaction = Fedora6::Client::Transaction.new({base: 'https://test_transaction.com/conflict'})
-        expect{transaction.get}.to raise_error(Fedora6::APIError)
+        expect{transaction.commit}.to raise_error(Fedora6::APIError)
         #expect(transaction.code).to eq '409'
 
     end
