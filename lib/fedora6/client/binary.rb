@@ -21,7 +21,7 @@ module Fedora6
       end
 
       def save(binary_data, filename, transaction_uri: nil)
-        if exists?(binary_uri)
+        if exists?
           response = Fedora6::Client::Binary.update_binary(@config, @uri, filename,
             binary_data, transaction_uri: transaction_uri)
           validate_response(response)
@@ -35,7 +35,7 @@ module Fedora6
       end
 
       def save_by_reference(filename, file_path, transaction_uri: nil)
-        if exists?(binary_uri)
+        if exists?
           response = Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri, filename,
             file_path, transaction_uri: transaction_uri)
           validate_response(response)
