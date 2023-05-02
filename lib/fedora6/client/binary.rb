@@ -95,7 +95,7 @@ module Fedora6
         end
       end
 
-      def self.create_binary_by_refrerence(config, parent_uri, file_identifier, file_path, transaction_uri: nil)
+      def self.create_binary_by_reference(config, parent_uri, file_identifier, file_path, transaction_uri: nil)
         # upload a file by sending a data binary by reference
         link = "file://#{file_path}; rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\";"
         url = URI.parse(parent_uri)
@@ -109,7 +109,7 @@ module Fedora6
         end
       end
 
-      def self.update_binary_by_refrerence(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
+      def self.update_binary_by_reference(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
         # update a file by sending a data binary by reference
         link = "file://#{file_path}; rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\";"
         url = URI.parse(binary_uri)
