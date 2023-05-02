@@ -15,26 +15,36 @@ module Fedora6
                         binary_uri
                       elsif parent_uri && binary_identifier
                         "#{parent_uri}/#{binary_identifier}"
+                      else
+                        nil
                       end
       end
 
       def save(binary_data, filename, transaction_uri: nil)
         if exists?(binary_uri)
-          Fedora6::Client::Binary.update_binary(@config, @binary_uri, filename,
-                                                binary_data, transaction_uri: transaction_uri)
+          response = Fedora6::Client::Binary.update_binary(@config, @binary_uri, filename,
+            binary_data, transaction_uri: transaction_uri)
+          validate_response(response)
+          return true
         else
-          Fedora6::Client::Binary.create_binary(@config, @parent_uri, @binary_identifier,
-                                                filename, binary_data, transaction_uri: transaction_uri)
+          response = Fedora6::Client::Binary.create_binary(@config, @parent_uri, @binary_identifier,
+            filename, binary_data, transaction_uri: transaction_uri)
+          validate_response(response)
+          @binary_uri = response.body
         end
       end
 
       def save_by_reference(filename, file_path, transaction_uri: nil)
         if exists?(binary_uri)
-          Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri, filename,
-                                                             file_path, transaction_uri: transaction_uri)
+          response = Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri, filename,
+            file_path, transaction_uri: transaction_uri)
+          validate_response(response)
+          return true
         else
-          Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, binary_identifier,
-                                                             filename, file_path, transaction_uri: transaction_uri)
+          response = Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, binary_identifier,
+            filename, file_path, transaction_uri: transaction_uri)
+            validate_response(response)
+            @binary_uri = response.body
         end
       end
 
