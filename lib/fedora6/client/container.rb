@@ -4,7 +4,10 @@ module Fedora6
         ARCHIVAL_GROUP="<http://fedora.info/definitions/v4/repository#ArchivalGroup>;rel=\"type\""
 
         def save(identifier: false, archival_group: false, transaction_uri: false)
-            return Fedora6::Client::Container.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
+            response = Fedora6::Client::Container.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
+            validate_response(response)
+            # Return new URI
+            return response.body
         end
 
         def get_metadata(uri)
@@ -42,7 +45,7 @@ module Fedora6
                 req.content_type = 'text/turtle'
                 http.request(req)
             end
-            return response.body
+            return response
         end
 
       end
