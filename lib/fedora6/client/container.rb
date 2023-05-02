@@ -11,7 +11,7 @@ module Fedora6
       def initialize(config = nil, identifier = nil)
         @config = Fedora6::Client::Config.new(config).config
         @identifier = identifier
-        @uri = "#{config[:base]}/#{identifier}"
+        @uri = "#{@config[:base].to_s}/#{identifier}"
       end
 
       def save(archival_group: false, transaction_uri: false)
