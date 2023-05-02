@@ -1,8 +1,10 @@
 # Fedora6::Client
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/fedora6/client`. To experiment with that code, run `bin/console` for an interactive prompt.
+The Fedora6::Client gem is for interaction with the Fedora6 Repository API, documented at https://wiki.lyrasis.org/display/FEDORA6x/REST+API+Specification
 
-TODO: Delete this and the text above, and describe your gem
+It was created by Thomas Wrobel <thomas.wrobel@bodliean.ox.ac.uk> in support of the integration between ORA (https://ora.ox.ac.uk) and the ORA Digital Preservation Service.
+
+A comapnion Gem that uses this gem for preserving objects within the API is ORA::DPS
 
 ## Installation
 
@@ -20,10 +22,6 @@ Or install it yourself as:
 
     $ gem install fedora6-client
 
-## Usage
-
-TODO: Write usage instructions here
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -32,7 +30,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/fedora6-client.
+Bug reports and pull requests are welcome on GitHub at https://github.com/tomwrobel/fedora6-client.
 
 ## License
 
