@@ -28,7 +28,7 @@ module Fedora6
             @config = Fedora6::Client::Config.new(config).config
         end
       
-        def exists? (uri)
+        def exists?(uri)
             response = head(self.config, uri) 
             if ['200', '204'].include? response.code
                 return true

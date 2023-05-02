@@ -2,16 +2,24 @@ module Fedora6
       class Client::Container < Client
 
         ARCHIVAL_GROUP="<http://fedora.info/definitions/v4/repository#ArchivalGroup>;rel=\"type\""
-
-        def save(identifier: false, archival_group: false, transaction_uri: false)
-            response = Fedora6::Client::Container.create_container(self.config, identifier, archival_group, transaction_uri: transaction_uri)
-            validate_response(response)
-            # Return new URI
-            return response.body
+        attr_reader :config, :identifier, :uri
+        def initialize(config=nil, identifier=nil)
+          @config = Fedora6::Client::Config.new(config).config
+          @identifier = identifier
+          @uri = "#{self.config['base']}/#{identifier}"
         end
 
-        def get_metadata(uri)
-            return Fedora6::Client::Container.get_container(self.config, uri)
+        def save(archival_group: false, transaction_uri: false)
+            response = Fedora6::Client::Container.create_container(self.config, self.identifier, archival_group, transaction_uri: transaction_uri)
+            validate_response(response)
+            # Return new URI
+            return true
+        end
+
+        def get_metadata
+            response = Fedora6::Client::Container.get_container(self.config, self.uri)
+            validate_response(response)
+            return response.body
         end
 
         # Class methods
