@@ -5,7 +5,7 @@ module Fedora6
     # Fedora6::Client::Binary
     # Class for interacting with Binary (Non-RDF binary resources)
     class Binary < Client
-      attr_reader :config, :parent_uri, :binary_identifier, :binary_uri
+      attr_reader :config, :parent_uri, :binary_identifier, :uri
 
       def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil)
         @config = Fedora6::Client::Config.new(config).config
