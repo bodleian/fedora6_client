@@ -8,5 +8,7 @@
 /tmp/
 vendor/*
 .byebug_history
+.idea/
+.idea/*
 # rspec failure tracking
 .rspec_status
