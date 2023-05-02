@@ -2,7 +2,7 @@ module Fedora6
       # Your code goes here...
       class Client::Binary < Client
 
-        def upload(file_identifier, filename, file_path, parent_uri, transaction_uri: false)
+        def save(file_identifier, filename, file_path, parent_uri, transaction_uri: false)
             if exists? ("#{parent_uri}/#{file_identifier}")
                 Fedora6::Client::Binary.update_binary(self.config, parent_uri, file_identifier, filename, file_path, transaction_uri: transaction_uri)
             else
