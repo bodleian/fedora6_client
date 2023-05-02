@@ -47,7 +47,7 @@ module Fedora6
           req = Net::HTTP::Post.new url
           req.basic_auth(config[:user], config[:password])
           req["Atomic-ID"] = transaction_uri if transaction_uri.present?
-          req["Slug"] = identifier if indentifier.present?
+          req["Slug"] = identifier if identifier.present?
           req["Link"] = ARCHIVAL_GROUP if archival_group
           req.content_type = "text/turtle"
           http.request(req)
