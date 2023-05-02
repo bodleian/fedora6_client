@@ -2,17 +2,14 @@
 
 require "net/http"
 require "uri"
-# frozen_string_literal: true
 
 require_relative "client/module_version"
-require_relative "client/config"
 require_relative "client/binary"
-require_relative "client/transaction"
+require_relative "client/config"
 require_relative "client/container"
+require_relative "client/transaction"
 
 module Fedora6
-  class Error < StandardError; end
-
   # Fedora6::Client::APIError
   # An error was returned by the Fedora6 API
   class APIError < StandardError
@@ -28,6 +25,8 @@ module Fedora6
   # Fedora6::Client
   # Class for Core Fedora6 Client operations
   class Client
+    class Error < StandardError; end
+
     attr_reader :config
 
     def initialize(config = nil)

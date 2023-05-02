@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "byebug"
   spec.add_dependency "net-http-persistent"
   spec.add_dependency "rspec"
+  spec.add_dependency "uri"
   spec.add_dependency "webmock"
 
   # For more information and examples about making a new gem, check out our

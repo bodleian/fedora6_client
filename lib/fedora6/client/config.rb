@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Fedora6
-  module Client
+  # Fedora6::Client configuration class
+  class Client
     # Fedora6::Client configuration class
     class Config
       attr_reader :config

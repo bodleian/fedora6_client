@@ -40,8 +40,8 @@ RSpec.configure do |config|
       .to_return(status: 204, body: nil)
     stub_request(:post, "https://test_transaction.com/missing/fcr:tx/12345678")
       .to_return(status: 404, body: nil)
-    stub_requ.est(:post, "https://test_transaction.com/expired/fcr:tx/12345678")
-             .to_return(status: 410, body: nil)
+    stub_request(:post, "https://test_transaction.com/expired/fcr:tx/12345678")
+      .to_return(status: 410, body: nil)
 
     # Commit transaction
     stub_request(:put, "https://test_transaction.com/base/fcr:tx/12345678")
