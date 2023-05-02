@@ -36,13 +36,13 @@ module Fedora6
 
       def save_by_reference(filename, file_path, transaction_uri: nil)
         if exists?
-          response = Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri, filename,
+          response = Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri,
             file_path, transaction_uri: transaction_uri)
           validate_response(response)
           return true
         else
-          response = Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, binary_identifier,
-            filename, file_path, transaction_uri: transaction_uri)
+          response = Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, @binary_identifier,
+            file_path, transaction_uri: transaction_uri)
             validate_response(response)
             @uri = response.body
         end
@@ -117,7 +117,6 @@ module Fedora6
           req = Net::HTTP::Put.new url
           req.basic_auth(config[:user], config[:password])
           req["Atomic-ID"] = transaction_uri if transaction_uri
-          req["Slug"] = file_identifier
           req["Link"] = link
           http.request(req)
         end
