@@ -4,44 +4,38 @@ module Fedora6
   class Client
     # Fedora6::Client::Transaction
     class Transaction < Client
-      attr_reader :tx_uri
+      attr_reader :uri
 
       def initialize(config = nil)
         ## Returns tx_id: the transaction uri
         @config = Fedora6::Client::Config.new(config).config
         response = Client::Transaction.start_transaction(@config)
         validate_response(response)
-        @tx_uri = response["Location"]
+        @uri = response["Location"]
       end
 
       def get
-        response = Client::Transaction.get_transaction(@config, @tx_uri)
+        response = Client::Transaction.get_transaction(@config, @uri)
         validate_response(response)
         true
       end
 
       def keep_alive
-        response = Client::Transaction.keep_transaction_alive(@config, @tx_uri)
+        response = Client::Transaction.keep_transaction_alive(@config, @uri)
         validate_response(response)
         true
       end
 
       def commit
-        response = Client::Transaction.commit_transaction(@config, @tx_uri)
+        response = Client::Transaction.commit_transaction(@config, @uri)
         validate_response(response)
         true
       end
 
       def rollback
-        response = Client::Transaction.rollback_transaction(@config, @tx_uri)
+        response = Client::Transaction.rollback_transaction(@config, @uri)
         validate_response(response)
         true
-      end
-
-      def validate_response(response)
-        return if %w[201 204].include? response.code
-
-        raise Fedora6::APIError.new(response.code, response.body)
       end
 
       # Class methods

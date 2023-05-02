@@ -11,18 +11,18 @@ module Fedora6
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
-        @binary_uri = if binary_uri
-                        binary_uri
-                      elsif parent_uri && binary_identifier
-                        "#{parent_uri}/#{binary_identifier}"
-                      else
-                        nil
-                      end
+        @uri = if binary_uri
+                 binary_uri
+               elsif parent_uri && binary_identifier
+                 "#{parent_uri}/#{binary_identifier}"
+               else
+                 nil
+               end
       end
 
       def save(binary_data, filename, transaction_uri: nil)
         if exists?(binary_uri)
-          response = Fedora6::Client::Binary.update_binary(@config, @binary_uri, filename,
+          response = Fedora6::Client::Binary.update_binary(@config, @uri, filename,
             binary_data, transaction_uri: transaction_uri)
           validate_response(response)
           return true
@@ -30,7 +30,7 @@ module Fedora6
           response = Fedora6::Client::Binary.create_binary(@config, @parent_uri, @binary_identifier,
             filename, binary_data, transaction_uri: transaction_uri)
           validate_response(response)
-          @binary_uri = response.body
+          @uri = response.body
         end
       end
 
@@ -44,7 +44,7 @@ module Fedora6
           response = Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, binary_identifier,
             filename, file_path, transaction_uri: transaction_uri)
             validate_response(response)
-            @binary_uri = response.body
+            @uri = response.body
         end
       end
 

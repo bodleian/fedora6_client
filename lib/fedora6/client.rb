@@ -33,7 +33,7 @@ module Fedora6
       @config = Fedora6::Client::Config.new(config).config
     end
 
-    def exists?(uri)
+    def exists?
       response = head(config, uri)
       if %w[200 204].include? response.code
         true
