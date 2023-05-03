@@ -4,6 +4,10 @@ module Fedora6
   class Client
     # Fedora6::Client::Binary
     # Class for interacting with Binary (Non-RDF binary resources)
+
+    EXTERNAL_CONTENT_REL="rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
+
+
     class Binary < Client
       attr_reader :config, :parent_uri, :binary_identifier, :uri
 
@@ -97,7 +101,7 @@ module Fedora6
 
       def self.create_binary_by_reference(config, parent_uri, file_identifier, file_path, transaction_uri: nil)
         # upload a file by sending a data binary by reference
-        link = "file://#{file_path}; rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\";"
+        link = "file://#{file_path}; #{EXTERNAL_CONTENT_REL}"
         url = URI.parse(parent_uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Post.new url
@@ -111,7 +115,7 @@ module Fedora6
 
       def self.update_binary_by_reference(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
         # update a file by sending a data binary by reference
-        link = "file://#{file_path}; rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\";"
+        link = "file://#{file_path}; #{EXTERNAL_CONTENT_REL}"
         url = URI.parse(binary_uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Put.new url
