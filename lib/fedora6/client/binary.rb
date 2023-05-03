@@ -101,7 +101,7 @@ module Fedora6
 
       def self.create_binary_by_reference(config, parent_uri, file_identifier, file_path, transaction_uri: nil)
         # upload a file by sending a data binary by reference
-        link = "file://#{file_path}; #{EXTERNAL_CONTENT_REL}"
+        link = "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
         url = URI.parse(parent_uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Post.new url
@@ -115,7 +115,7 @@ module Fedora6
 
       def self.update_binary_by_reference(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
         # update a file by sending a data binary by reference
-        link = "file://#{file_path}; #{EXTERNAL_CONTENT_REL}"
+        link = "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
         url = URI.parse(binary_uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Put.new url
