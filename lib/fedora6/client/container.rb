@@ -36,6 +36,7 @@ module Fedora6
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Get.new url
           req.basic_auth(config[:user], config[:password])
+          req['Accept'] = "application/ld+json"
           http.request(req)
         end
       end

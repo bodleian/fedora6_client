@@ -110,7 +110,7 @@ module Fedora6
     end
 
     def validate_response(response, transaction_uri = nil, config = nil)
-      return if %w[201 204].include? response.code
+      return if %w[200 201 204].include? response.code
 
       raise Fedora6::APIError.new(response.code, response.body, transaction_uri, config)
     end
