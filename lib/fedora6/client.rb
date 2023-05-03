@@ -72,6 +72,24 @@ module Fedora6
       end
     end
 
+    def delete_tombstone(tombstone_uri = nil)
+      tombstone_uri = uri + '/fcr:tombstone'
+      response = Fedora6::Client.delete_object(config, tombstone_uri, transaction_uri: transaction_uri)
+      validate_response(response)
+      true
+    end
+    
+    def delete(tombstone_uri = nil)
+      response = Fedora6::Client.delete_object(config, uri, transaction_uri: transaction_uri)
+      validate_response(response)
+      true
+    end
+
+    def purge(transaction_uri = nil)
+      delete(uri)
+      delete_tombstone(uri)
+    end
+
     def head(config, uri)
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
@@ -79,6 +97,16 @@ module Fedora6
         req.basic_auth(config[:user], config[:password])
         http.request(req)
       end
+    end
+
+    def self.delete_object(config, uri, transaction_uri: nil)
+      url = URI.parse(uri)
+      Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
+        req = Net::HTTP::Delete.new url
+        req.basic_auth(config[:user], config[:password])
+        req["Atomic-ID"] = transaction_uri if transaction_uri
+        http.request(req)
+      end        
     end
 
     def validate_response(response, transaction_uri = nil, config = nil)
