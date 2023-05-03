@@ -24,12 +24,12 @@ module Fedora6
         if exists?
           response = Fedora6::Client::Binary.update_binary(@config, @uri, filename,
             binary_data, transaction_uri: transaction_uri)
-          validate_response(response)
+          validate_response(response, transaction_uri, @config)
           return true
         else
           response = Fedora6::Client::Binary.create_binary(@config, @parent_uri, @binary_identifier,
             filename, binary_data, transaction_uri: transaction_uri)
-          validate_response(response)
+          validate_response(response, transaction_uri, @config)
           @uri = response.body
         end
       end
@@ -38,12 +38,12 @@ module Fedora6
         if exists?
           response = Fedora6::Client::Binary.update_binary_by_reference(@config, @binary_uri,
             file_path, transaction_uri: transaction_uri)
-          validate_response(response)
+          validate_response(response, transaction_uri, @config)
           return true
         else
           response = Fedora6::Client::Binary.create_binary_by_reference(@config, @parent_uri, @binary_identifier,
             file_path, transaction_uri: transaction_uri)
-            validate_response(response)
+            validate_response(response, transaction_uri, @config)
             @uri = response.body
         end
       end

@@ -16,25 +16,25 @@ module Fedora6
 
       def get
         response = Client::Transaction.get_transaction(@config, @uri)
-        validate_response(response)
+        validate_response(response, @uri, @config)
         true
       end
 
       def keep_alive
         response = Client::Transaction.keep_transaction_alive(@config, @uri)
-        validate_response(response)
+        validate_response(response, @uri, @config)
         true
       end
 
       def commit
         response = Client::Transaction.commit_transaction(@config, @uri)
-        validate_response(response)
+        validate_response(response, @uri, @config)
         true
       end
 
       def rollback
         response = Client::Transaction.rollback_transaction(@config, @uri)
-        validate_response(response)
+        validate_response(response, @uri, @config)
         true
       end
 
@@ -50,9 +50,9 @@ module Fedora6
         end
       end
 
-      def self.get_transaction(config, tx_uri)
+      def self.get_transaction(config, uri)
         # Returns a transaction ID
-        url = URI.parse(tx_uri)
+        url = URI.parse(uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Get.new url
           req.basic_auth(config[:user], config[:password])
@@ -60,9 +60,9 @@ module Fedora6
         end
       end
 
-      def self.keep_transaction_alive(config, tx_uri)
+      def self.keep_transaction_alive(config, uri)
         # keeps a transaction that's > 3 minutes long alive
-        url = URI.parse(tx_uri)
+        url = URI.parse(uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Post.new url
           req.basic_auth(config[:user], config[:password])
@@ -70,9 +70,9 @@ module Fedora6
         end
       end
 
-      def self.commit_transaction(config, tx_uri)
+      def self.commit_transaction(config, uri)
         # keeps a transaction that's > 3 minutes long alive
-        url = URI.parse(tx_uri)
+        url = URI.parse(uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Put.new url
           req.basic_auth(config[:user], config[:password])
@@ -80,8 +80,8 @@ module Fedora6
         end
       end
 
-      def self.rollback_transaction(config, tx_uri)
-        url = URI.parse(tx_uri)
+      def self.rollback_transaction(config, uri)
+        url = URI.parse(uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Delete.new url
           req.basic_auth(config[:user], config[:password])

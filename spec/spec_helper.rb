@@ -56,9 +56,11 @@ RSpec.configure do |config|
     # Rollback transaction
     stub_request(:delete, "https://test_transaction.com/base/fcr:tx/12345678")
       .to_return(status: 204, body: nil)
-    stub_request(:post, "https://test_transaction.com/missing/fcr:tx/12345678")
+    stub_request(:delete, "https://test_transaction.com/missing/fcr:tx/12345678")
       .to_return(status: 404, body: nil)
-    stub_request(:post, "https://test_transaction.com/expired/fcr:tx/12345678")
+    stub_request(:delete, "https://test_transaction.com/conflict/fcr:tx/12345678")
+      .to_return(status: 204, body: nil)
+    stub_request(:delete, "https://test_transaction.com/expired/fcr:tx/12345678")
       .to_return(status: 410, body: nil)
   end
 end

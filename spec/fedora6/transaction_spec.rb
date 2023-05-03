@@ -29,16 +29,16 @@ RSpec.describe Fedora6::Client::Transaction do
 
   it "returns 404 when transaction not found" do
     transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/missing" })
-    expect { transaction.get }.to raise_error(Fedora6::APIError, "404")
+    expect { transaction.get }.to raise_error(Fedora6::APIError, "404:  Transaction https://test_transaction.com/missing/fcr:tx/12345678 not found.")
   end
 
   it "returns 409 on conflict" do
     transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/conflict" })
-    expect { transaction.commit }.to raise_error(Fedora6::APIError, "409")
+    expect { transaction.commit }.to raise_error(Fedora6::APIError, "409:  Transaction https://test_transaction.com/conflict/fcr:tx/12345678 rolled back.")
   end
 
   it "returns 410 when transaction expired" do
     transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/expired" })
-    expect { transaction.get }.to raise_error(Fedora6::APIError, "410")
+    expect { transaction.get }.to raise_error(Fedora6::APIError, "410:  Transaction https://test_transaction.com/expired/fcr:tx/12345678 already expired.")
   end
 end

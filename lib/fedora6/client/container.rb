@@ -18,7 +18,7 @@ module Fedora6
         response = Fedora6::Client::Container.create_container(
           @config, @identifier, archival_group, transaction_uri: transaction_uri
         )
-        validate_response(response)
+        validate_response(response, transaction_uri, @config)
         # Return new URI
         true
       end

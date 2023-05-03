@@ -13,11 +13,30 @@ module Fedora6
   # Fedora6::Client::APIError
   # An error was returned by the Fedora6 API
   class APIError < StandardError
-    def initialize(code, message)
+    def initialize(code, message, transaction_uri = nil, config = nil)
+
+      # rollback transaction if one is in progress
+      if transaction_uri
+        rollback_message = rollback_transaction(config, transaction_uri)
+        message = [message, rollback_message].join(' ')
+      end
       if message && message != ""
         super("#{code}: #{message}")
       else
         super(code.to_s)
+      end
+    end
+
+    def rollback_transaction(config, transaction_uri)
+      response = Fedora6::Client::Transaction.rollback_transaction(config, transaction_uri)
+      if response.code == "204"
+        return "Transaction #{transaction_uri} rolled back."
+      elsif response.code == "404"
+        return "Transaction #{transaction_uri} not found."
+      elsif response.code == "410"
+        return "Transaction #{transaction_uri} already expired."
+      else
+        return "Unspecified error occured rolling back #{transaction_uri}"
       end
     end
   end
@@ -51,10 +70,10 @@ module Fedora6
       end
     end
 
-    def validate_response(response)
+    def validate_response(response, transaction_uri = nil, config = nil)
       return if %w[201 204].include? response.code
 
-      raise Fedora6::APIError.new(response.code, response.body)
+      raise Fedora6::APIError.new(response.code, response.body, transaction_uri, config)
     end
   end
 end
