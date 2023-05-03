@@ -5,7 +5,7 @@ module Fedora6
     # Fedora6::Client::Binary
     # Class for interacting with Binary (Non-RDF binary resources)
 
-    EXTERNAL_CONTENT_REL="rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
+    EXTERNAL_CONTENT_REL = "rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
 
 
     class Binary < Client
