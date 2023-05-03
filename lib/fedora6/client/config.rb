@@ -12,12 +12,12 @@ module Fedora6
         user = "ora"
         server = "ora4-qa-dps-witness.bodleian.ox.ac.uk"
         port = "443"
-        file_root = "/tmp/"
+        ocfl_root = "/data/ocfl/ocfl-root/"
         {
           user: user,
           password: password,
           base: "https://#{server}:#{port}/fcrepo/rest",
-          upload_file_root: file_root
+          ocfl_root: ocfl_root
         }
       end
 

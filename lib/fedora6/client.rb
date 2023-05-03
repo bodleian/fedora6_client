@@ -52,6 +52,17 @@ module Fedora6
       @config = Fedora6::Client::Config.new(config).config
     end
 
+    def ocfl_identifier
+      uri.gsub("#{@config[:base]}", 'info:fedora')
+    end
+
+    def ocfl_object_path
+      root = @config[:ocfl_root]
+      id_digest = Digest::SHA2.new(256).hexdigest ocfl_identifier
+      object_path = "#{id_digest[0,3]}/#{id_digest[3,3]}/#{id_digest[6,3]}/#{id_digest}"
+      return File.join(config[:ocfl_root], object_path)
+    end
+
     def exists?
       response = head(config, uri)
       if %w[200 204].include? response.code
