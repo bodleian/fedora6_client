@@ -15,7 +15,15 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+
+    ### Container stubs
+
+
     ### Transaction stubs
+    stub_request(:delete, "https://test_transaction.com/base/uuid_12345678-1234-1234-1234-12345678abcd")
+      .to_return(status: 204, body: nil)
+      stub_request(:delete, "https://test_transaction.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:tombstone")
+      .to_return(status: 204, body: nil)
 
     # Create transaction
     stub_request(:post, "https://test_transaction.com/base/fcr:tx")

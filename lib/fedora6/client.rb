@@ -86,8 +86,8 @@ module Fedora6
     end
 
     def purge(transaction_uri = nil)
-      delete(uri, transaction_uri)
-      delete_tombstone(uri, transaction_uri)
+      delete(transaction_uri)
+      delete_tombstone(transaction_uri)
     end
 
     def head(config, uri)

@@ -16,4 +16,22 @@ RSpec.describe Fedora6::Client do
     container = Fedora6::Client::Container.new(config, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.ocfl_identifier).to eq 'info:fedora/uuid_12345678-1234-1234-1234-12345678abcd'
   end
+
+  it "has purge function" do 
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    expect(container.purge(transaction.uri)).to eq true
+  end
+
+  it "has delete function" do
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    expect(container.delete(transaction.uri)).to eq true
+  end
+
+  it "has delete tomstone function" do
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    expect(container.delete_tombstone(transaction.uri)).to eq true
+  end
 end
