@@ -74,7 +74,7 @@ module Fedora6
 
     def versions
       versions_uri = uri + '/fcr:versions'
-      response = Fedora6::Client.get(config, versions_uri)
+      response = get(config, versions_uri)
       validate_response
       return response.body
     end

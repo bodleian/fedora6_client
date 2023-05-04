@@ -24,7 +24,7 @@ module Fedora6
       end
 
       def metadata
-        response = Fedora6::Client::Container.get(@config, @uri)
+        response = get(@config, @uri)
         validate_response(response)
         response.body
       end
