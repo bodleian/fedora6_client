@@ -72,22 +72,22 @@ module Fedora6
       end
     end
 
-    def delete_tombstone(tombstone_uri = nil)
+    def delete_tombstone(transaction_uri = nil)
       tombstone_uri = uri + '/fcr:tombstone'
       response = Fedora6::Client.delete_object(config, tombstone_uri, transaction_uri: transaction_uri)
       validate_response(response)
       true
     end
     
-    def delete(tombstone_uri = nil)
+    def delete(transaction_uri = nil)
       response = Fedora6::Client.delete_object(config, uri, transaction_uri: transaction_uri)
       validate_response(response)
       true
     end
 
     def purge(transaction_uri = nil)
-      delete(uri)
-      delete_tombstone(uri)
+      delete(uri, transaction_uri)
+      delete_tombstone(uri, transaction_uri)
     end
 
     def head(config, uri)
