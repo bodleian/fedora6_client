@@ -24,22 +24,12 @@ module Fedora6
       end
 
       def metadata
-        response = Fedora6::Client::Container.get_container(@config, @uri)
+        response = Fedora6::Client::Container.get(@config, @uri)
         validate_response(response)
         response.body
       end
 
       # Class methods
-
-      def self.get_container(config, uri)
-        url = URI.parse(uri)
-        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
-          req = Net::HTTP::Get.new url
-          req.basic_auth(config[:user], config[:password])
-          req['Accept'] = "application/ld+json"
-          http.request(req)
-        end
-      end
 
       def self.create_container(config, identifier, archival_group, transaction_uri: false)
         # create OCFL object

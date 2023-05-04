@@ -72,6 +72,13 @@ module Fedora6
       end
     end
 
+    def versions
+      versions_uri = uri + '/fcr:versions'
+      response = Fedora6::Client.get(config, versions_uri)
+      validate_response
+      return response.body
+    end
+
     def delete_tombstone(transaction_uri = nil)
       tombstone_uri = uri + '/fcr:tombstone'
       response = Fedora6::Client.delete_object(config, tombstone_uri, transaction_uri: transaction_uri)
@@ -95,6 +102,16 @@ module Fedora6
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Head.new url
         req.basic_auth(config[:user], config[:password])
+        http.request(req)
+      end
+    end
+
+    def get(config, uri)
+      url = URI.parse(uri.to_s)
+      Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
+        req = Net::HTTP::Get.new url
+        req.basic_auth(config[:user], config[:password])
+        req['Accept'] = "application/ld+json"
         http.request(req)
       end
     end
