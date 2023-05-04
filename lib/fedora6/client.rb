@@ -8,6 +8,8 @@ require_relative "client/binary"
 require_relative "client/config"
 require_relative "client/container"
 require_relative "client/transaction"
+require_relative "client/version"
+
 
 module Fedora6
   # Fedora6::Client::APIError

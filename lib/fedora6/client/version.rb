@@ -10,7 +10,7 @@ module Fedora6
         def initialize(config = nil, parent_uri = nil, identifier = nil)
           @config = Fedora6::Client::Config.new(config).config
           @identifier = identifier
-          @uri = "#{parent_uri}}/fcr:versions/#{identifier}"
+          @uri = "#{parent_uri}/fcr:versions/#{identifier}"
         end
   
   
