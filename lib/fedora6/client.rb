@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'date'
 require "net/http"
 require "uri"
 
@@ -108,14 +108,25 @@ module Fedora6
       end
     end
 
-    def get(config, uri)
+    def get(config, uri, timestamp: nil)
+      fedora_timestamp = self.rfc1132_timestamp(timestamp)
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Get.new url
         req.basic_auth(config[:user], config[:password])
         req['Accept'] = "application/ld+json"
+        req['Accept-Datetime'] = fedora_timestamp if fedora_timestamp
         http.request(req)
       end
+    end
+
+    def self.rfc1132_timestamp(timestamp)
+      # Take a date string or ruby datetime object and output an RFC-1123 date
+      return false unless timestamp
+      return false if timestamp.to_s.empty?
+      
+      datetime_object = DateTime.parse(timestamp.to_s)
+      datetime_object.strftime("%a, %d %b %Y %H:%M:%S %Z")
     end
 
     def self.delete_object(config, uri, transaction_uri: nil)

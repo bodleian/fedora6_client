@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'date'
+
 RSpec.describe Fedora6::Client do
   it "has a Version" do
     expect(Fedora6::Client::VERSION).not_to be nil
@@ -33,5 +35,19 @@ RSpec.describe Fedora6::Client do
     transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
     container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.delete_tombstone(transaction.uri)).to eq true
+  end
+
+  it "parses dates" do 
+    input_date = "2022-05-05T13:50"
+    expected_date_string = "Thu, 05 May 2022 13:50:00 +00:00"
+    datetime_object = DateTime.parse(input_date)
+    # Test both strings and DateTime objects
+    [input_date, datetime_object].map do |d|
+      expect(Fedora6::Client.rfc1132_timestamp(d)).to eq expected_date_string
+    end
+    # Test nil inputs return false
+    expect(Fedora6::Client.rfc1132_timestamp(false)).to eq false
+    expect(Fedora6::Client.rfc1132_timestamp('')).to eq false
+
   end
 end
