@@ -3,21 +3,19 @@
 module Fedora6
     class Client
       # Fedora6::Client::Version
-      # Class for managing Fedora6 RDF Version
+      # Class for managing Fedora6 RDF Version(s)
       class Version < Client
-        attr_reader :config, :identifier, :uri
+        attr_reader :config, :memento, :uri
   
-        def initialize(config = nil, parent_uri = nil, identifier = nil)
-          @config = Fedora6::Client::Config.new(config).config
-          @identifier = identifier
-          @uri = "#{parent_uri}/fcr:versions/#{identifier}"
+        def initialize(config = nil, uri = nil)
+          @config = config || Fedora6::Client::Config.new.config
+          @uri = uri
+          @memento = memento
         end
-  
-  
-        def metadata
-          response = get(@config, @uri)
-          validate_response(response)
-          response.body
+
+        def memento
+          version_metadata = metadata
+          return version_metadata["Memento-Datetime"]
         end
   
         # Class methods

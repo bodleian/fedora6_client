@@ -23,12 +23,6 @@ module Fedora6
         true
       end
 
-      def metadata
-        response = get(@config, @uri)
-        validate_response(response)
-        response.body
-      end
-
       # Class methods
 
       def self.create_container(config, identifier, archival_group, transaction_uri: false)
