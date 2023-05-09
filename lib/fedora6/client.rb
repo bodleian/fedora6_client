@@ -73,6 +73,8 @@ module Fedora6
       end
     end
 
+    ### TODO: rewrite to detect child type. binary metadata uses get_binary_metadata
+
     def metadata
       response = get(@config, @uri)
       validate_response(response)

@@ -118,9 +118,11 @@ RSpec.configure do |config|
       .to_return(status: 200, body: versions_list)
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141819")
       .to_return(status: 200, headers: {"Memento-Datetime" => 'Fri, 28 Apr 2023 13:59:09 GMT'}, body: "[]")
-    stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141753")
+    stub_request(:head, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141819")
+      .to_return(status: 200, headers: {"Memento-Datetime" => 'Fri, 28 Apr 2023 13:59:09 GMT'}, body: "[]")
+    stub_request(:head, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141753")
       .to_return(status: 200, headers: {"Memento-Datetime" => 'Sat, 29 Apr 2023 14:59:09 GMT'}, body: "[]")
-    stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428140019")
+    stub_request(:head, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428140019")
       .to_return(status: 200, headers: {"Memento-Datetime" => 'Sun, 23 Apr 2023 15:59:09 GMT'}, body: "[]")
   end
 end

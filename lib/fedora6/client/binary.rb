@@ -25,6 +25,13 @@ module Fedora6
                end
       end
 
+      def metadata
+        metadata_uri = uri + '/fcr:metadata'
+        response = get(config, metadata_uri)
+        json = JSON.parse(response.body)
+        return json.first
+      end
+
       def save(binary_data, filename, transaction_uri: nil)
         if exists?
           response = Fedora6::Client::Binary.update_binary(@config, @uri, filename,
@@ -54,24 +61,6 @@ module Fedora6
       end
 
       # Class methods
-
-      def self.get_binary_metadata(config, binary_uri)
-        url = URI.parse("#{binary_uri}/fcr:metadata")
-        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
-          req = Net::HTTP::Get.new url
-          req.basic_auth(config[:user], config[:password])
-          http.request(req)
-        end
-      end
-
-      def self.get_binary_versions(config, binary_uri)
-        url = URI.parse("#{binary_uri}/fcr:versions")
-        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
-          req = Net::HTTP::Get.new url
-          req.basic_auth(config[:user], config[:password])
-          http.request(req)
-        end
-      end
 
       def self.create_binary(config, parent_uri, file_identifier, filename, binary_data, transaction_uri: nil)
         # upload a file by sending a data binary

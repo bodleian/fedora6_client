@@ -14,7 +14,9 @@ module Fedora6
         end
 
         def memento
-          version_metadata = get(@config, @uri)
+          # The only metadata we need here is in a header, a good thing, because
+          # the get call to the version for a binary file downloads the file
+          version_metadata = head(@config, @uri)
           return version_metadata["Memento-Datetime"]
         end
   
