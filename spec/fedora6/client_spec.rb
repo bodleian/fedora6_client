@@ -20,20 +20,20 @@ RSpec.describe Fedora6::Client do
   end
 
   it "has purge function" do 
-    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
-    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.purge(transaction.uri)).to eq true
   end
 
   it "has delete function" do
-    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
-    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.delete(transaction.uri)).to eq true
   end
 
   it "has delete tomstone function" do
-    transaction = Fedora6::Client::Transaction.new({ base: "https://test_transaction.com/base" })
-    container = Fedora6::Client::Container.new({ base: "https://test_transaction.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    transaction = Fedora6::Client::Transaction.new({ base: "https://test.com/base" })
+    container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.delete_tombstone(transaction.uri)).to eq true
   end
 
@@ -49,5 +49,10 @@ RSpec.describe Fedora6::Client do
     expect(Fedora6::Client.rfc1132_timestamp(false)).to eq false
     expect(Fedora6::Client.rfc1132_timestamp('')).to eq false
 
+  end
+
+  it "gets versions" do
+    container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    expect(container.versions.first.memento).to eq 'Sun, 23 Apr 2023 15:59:09 GMT'
   end
 end

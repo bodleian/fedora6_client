@@ -74,11 +74,29 @@ module Fedora6
       end
     end
 
+    def metadata
+      response = get(@config, @uri)
+      validate_response(response)
+      response
+    end
+
     def versions
+      # TODO: write tests, extend spec for each version 
       versions_uri = uri + '/fcr:versions'
       response = get(config, versions_uri)
       validate_response(response)
-      return response.body
+      json_versions = JSON.parse(response.body).first
+      version_uris = json_versions['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
+      versions = version_uris.map do |v|
+        Fedora6::Client::Version.new(@config, v)
+      end
+      sorted_versions = versions.sort_by{|v| DateTime.parse(v.memento)}
+    end
+
+    def children
+      object_metadata = metadata.body
+      children = metadata.first['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
+      return children
     end
 
     def delete_tombstone(transaction_uri = nil)
@@ -109,7 +127,7 @@ module Fedora6
     end
 
     def get(config, uri, timestamp: nil)
-      fedora_timestamp = self.rfc1132_timestamp(timestamp)
+      fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Get.new url
