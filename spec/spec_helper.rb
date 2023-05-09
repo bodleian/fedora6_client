@@ -31,6 +31,19 @@ RSpec.configure do |config|
     }]
     \n
 """
+  object_metadata = """[{
+     \"@id\":\"https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/\",
+     \"http://www.w3.org/ns/ldp#contains\":
+         [{\"@id\":\"https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/uuid_12345678-1234-1234-1234-12345678abcd.metadata.ora.v2.json\"},
+          {\"@id\":\"https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fileset1\"}
+     ],
+     \"@type\":[\"http://www.w3.org/ns/ldp#Container\",\"http://www.w3.org/ns/ldp#RDFSource\",\"http://fedora.info/definitions/v4/repository#Container\",\"http://www.w3.org/ns/ldp#Resource\",\"http://www.w3.org/ns/ldp#BasicContainer\",\"http://fedora.info/definitions/v4/repository#Resource\"],
+     \"http://fedora.info/definitions/v4/repository#created\":[{\"@value\":\"2023-05-09T11:36:24.762663Z\",\"@type\":\"http://www.w3.org/2001/XMLSchema#dateTime\"}],
+     \"http://fedora.info/definitions/v4/repository#lastModified\":[{\"@value\":\"2023-05-09T11:36:24.762663Z\",\"@type\":\"http://www.w3.org/2001/XMLSchema#dateTime\"}],
+     \"http://fedora.info/definitions/v4/repository#createdBy\":[{\"@value\":\"ora\"}],
+     \"http://fedora.info/definitions/v4/repository#lastModifiedBy\":[{\"@value\":\"ora\"}]}]
+\n
+"""
 
 
   config.before(:each) do
@@ -39,7 +52,7 @@ RSpec.configure do |config|
 
     ### Container stubs
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd")
-      .to_return(status: 204, body: nil)
+      .to_return(status: 200, body: object_metadata)
     stub_request(:delete, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd")
       .to_return(status: 204, body: nil)
 
@@ -104,10 +117,10 @@ RSpec.configure do |config|
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions")
       .to_return(status: 200, body: versions_list)
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141819")
-      .to_return(status: 200, headers: {"Memento-Datetime" => 'Fri, 28 Apr 2023 13:59:09 GMT'}, body: nil)
+      .to_return(status: 200, headers: {"Memento-Datetime" => 'Fri, 28 Apr 2023 13:59:09 GMT'}, body: "[]")
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428141753")
-      .to_return(status: 200, headers: {"Memento-Datetime" => 'Sat, 29 Apr 2023 14:59:09 GMT'}, body: nil)
+      .to_return(status: 200, headers: {"Memento-Datetime" => 'Sat, 29 Apr 2023 14:59:09 GMT'}, body: "[]")
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions/20230428140019")
-      .to_return(status: 200, headers: {"Memento-Datetime" => 'Sun, 23 Apr 2023 15:59:09 GMT'}, body: nil)
+      .to_return(status: 200, headers: {"Memento-Datetime" => 'Sun, 23 Apr 2023 15:59:09 GMT'}, body: "[]")
   end
 end

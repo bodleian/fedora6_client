@@ -55,4 +55,9 @@ RSpec.describe Fedora6::Client do
     container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
     expect(container.versions.first.memento).to eq 'Sun, 23 Apr 2023 15:59:09 GMT'
   end
+
+  it "lists child uris" do
+    container = Fedora6::Client::Container.new({ base: "https://test.com/base" }, 'uuid_12345678-1234-1234-1234-12345678abcd')
+    expect(container.children).to include "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/uuid_12345678-1234-1234-1234-12345678abcd.metadata.ora.v2.json"
+  end
 end

@@ -14,7 +14,7 @@ module Fedora6
         end
 
         def memento
-          version_metadata = metadata
+          version_metadata = get(@config, @uri)
           return version_metadata["Memento-Datetime"]
         end
   

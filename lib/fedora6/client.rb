@@ -59,7 +59,6 @@ module Fedora6
     end
 
     def ocfl_object_path
-      root = @config[:ocfl_root]
       id_digest = Digest::SHA2.new(256).hexdigest ocfl_identifier
       object_path = "#{id_digest[0,3]}/#{id_digest[3,3]}/#{id_digest[6,3]}/#{id_digest}"
       return File.join(config[:ocfl_root], object_path)
@@ -77,11 +76,11 @@ module Fedora6
     def metadata
       response = get(@config, @uri)
       validate_response(response)
-      response
+      json = JSON.parse(response.body)
+      return json.first
     end
 
     def versions
-      # TODO: write tests, extend spec for each version 
       versions_uri = uri + '/fcr:versions'
       response = get(config, versions_uri)
       validate_response(response)
@@ -90,12 +89,12 @@ module Fedora6
       versions = version_uris.map do |v|
         Fedora6::Client::Version.new(@config, v)
       end
-      sorted_versions = versions.sort_by{|v| DateTime.parse(v.memento)}
+      versions.sort_by{|v| DateTime.parse(v.memento)}
     end
 
     def children
-      object_metadata = metadata.body
-      children = metadata.first['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
+      object_metadata = metadata
+      children = object_metadata['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
       return children
     end
 
