@@ -82,12 +82,18 @@ module Fedora6
       return json.first
     end
 
+    def new_version(transaction_uri: nil)
+      response = Fedora6::Client::Version.create_version(config, uri, transaction_uri: transaction_uri)
+      validate_response(response)
+      Fedora6::Client::Version.new(config, response['Location'])
+    end
+
     def versions
-      versions_uri = uri + '/fcr:versions'
+      versions_uri = uri + "/fcr:versions"
       response = get(config, versions_uri)
       validate_response(response)
       json_versions = JSON.parse(response.body).first
-      version_uris = json_versions['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
+      version_uris = json_versions["http://www.w3.org/ns/ldp#contains"].map{|f| f['@id']}
       versions = version_uris.map do |v|
         Fedora6::Client::Version.new(@config, v)
       end

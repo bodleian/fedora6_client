@@ -18,5 +18,12 @@ RSpec.describe Fedora6::Client::Version do
         expect(version.memento).to eq 'Fri, 28 Apr 2023 13:59:09 GMT'
     end
 
+    it "can create new versions" do
+        ocfl_object = Fedora6::Client::Container.new({ base: "https://test.com/base" }, "uuid_12345678-1234-1234-1234-12345678abcd")
+        version = ocfl_object.new_version
+        expect(version.memento).to eq 'Sat, 30 Apr 2023 13:59:09 GMT'
+    end
+
+
 
 end
