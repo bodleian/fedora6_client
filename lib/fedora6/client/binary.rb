@@ -42,7 +42,7 @@ module Fedora6
 
       def save_by_reference(file_path, transaction_uri: nil)
         if exists?
-          response = Fedora6::Client::Binary.update_binary_by_reference(config, @binary_uri,
+          response = Fedora6::Client::Binary.update_binary_by_reference(config, @uri,
                                                                         file_path, transaction_uri: transaction_uri)
           validate_response(response, transaction_uri, config)
           true
@@ -88,7 +88,7 @@ module Fedora6
           link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
         }
 
-        perform_request(config, binary_uri, Net::HTTP::Post, args)
+        perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
       def self.update_binary_by_reference(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
@@ -101,7 +101,7 @@ module Fedora6
         perform_request(config, binary_uri, Net::HTTP::Put, args)
       end
 
-      def self.perform_request(config, uri, http_request, args: {})
+      def self.perform_request(config, uri, http_request, args={})
         url = URI.parse(uri)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = http_request.new url
