@@ -4,7 +4,7 @@ The Fedora6::Client gem is for interaction with the Fedora6 Repository API, docu
 
 It was created by Thomas Wrobel <thomas.wrobel@bodliean.ox.ac.uk> in support of the integration between ORA (https://ora.ox.ac.uk) and the ORA Digital Preservation Service.
 
-A comapnion Gem that uses this gem for preserving objects within the API is ORA::DPS
+A comapnion class that uses this gem for preserving objects within the API is ORA::DPS, available on request.
 
 ## Installation
 
