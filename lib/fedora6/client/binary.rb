@@ -54,6 +54,23 @@ module Fedora6
         end
       end
 
+      def save_by_stream(file_path, transaction_uri: nil, mime_type: "application/octet-stream")
+        if exists?
+          response = Fedora6::Client::Binary.update_binary_by_stream(config, @uri, file_path,
+                                                                     transaction_uri: transaction_uri,
+                                                                     mime_type: mime_type)
+          validate_response(response, transaction_uri, config)
+          true
+        else
+          response = Fedora6::Client::Binary.create_binary_by_stream(config, parent_uri, @binary_identifier,
+                                                                     file_path,
+                                                                     transaction_uri: transaction_uri,
+                                                                     mime_type: mime_type)
+          validate_response(response, transaction_uri, config)
+          @uri = response.body
+        end
+      end
+
       # Class methods
 
       def self.create_binary(config, parent_uri, file_identifier, filename, binary_data, transaction_uri: nil)
@@ -91,11 +108,34 @@ module Fedora6
         perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
-      def self.update_binary_by_reference(config, binary_uri, file_identifier, file_path, transaction_uri: nil)
+      def self.update_binary_by_reference(config, binary_uri, file_path, transaction_uri: nil)
         # update a file by sending a data binary by reference
         args = {
           transaction_uri: transaction_uri,
           link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
+        }
+
+        perform_request(config, binary_uri, Net::HTTP::Put, args)
+      end
+
+      def self.create_binary_by_stream(config, parent_uri, file_identifier, file_path, transaction_uri: nil, mime_type: "application/octet-stream")
+        # upload a file by sending a data binary by reference
+        args = {
+          file_identifier: file_identifier,
+          transaction_uri: transaction_uri,
+          body_stream: file_path,
+          mime_type: mime_type
+        }
+
+        perform_request(config, parent_uri, Net::HTTP::Post, args)
+      end
+
+      def self.update_binary_by_stream(config, binary_uri, file_path, transaction_uri: nil, mime_type: "application/octet-stream")
+        # update a file by sending a data binary by reference
+        args = {
+          transaction_uri: transaction_uri,
+          body_stream: file_path,
+          mime_type: mime_type
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -106,7 +146,14 @@ module Fedora6
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = http_request.new url
           req.basic_auth(config[:user], config[:password])
-          req.body = args[:body] if args[:body]
+          if args[:body]
+            req.body = args[:body]
+          elsif args[:body_stream] and File.exists?(args[:body_stream])
+            req.body_stream = File.open(args[:body_stream])
+            req.content_length = File.size(args[:body_stream])
+            req.content_type = args[:mime_type]
+          end
+
           req["Link"] = args[:link] if args[:link]
           req["Slug"] = args[:file_identifier] if args[:file_identifier]
           req["Atomic-ID"] = args[:transaction_uri] if args[:transaction_uri]
