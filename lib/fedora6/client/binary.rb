@@ -42,7 +42,7 @@ module Fedora6
       end
 
       def save_by_reference(file_path, transaction_uri: nil)
-        if exists? or tombstone?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_reference(config, @uri,
                                                                         file_path, transaction_uri: transaction_uri)
           validate_response(response, transaction_uri, config)
@@ -56,7 +56,7 @@ module Fedora6
       end
 
       def save_by_stream(file_path, transaction_uri: nil, mime_type: "application/octet-stream")
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_stream(config, @uri, file_path,
                                                                      transaction_uri: transaction_uri,
                                                                      mime_type: mime_type)
