@@ -10,13 +10,14 @@ module Fedora6
     EXTERNAL_CONTENT_REL = "rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
 
     class Binary < Client
-      attr_reader :config, :parent_uri, :binary_identifier, :uri
+      attr_reader :config, :parent_uri, :binary_identifier, :uri, :in_archival_group
 
-      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil)
+      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil, in_archival_group = true)
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
         @uri = parent_uri && binary_identifier ? "#{parent_uri}/#{binary_identifier}" : binary_uri
+        @in_archival_group = in_archival_group
       end
 
       def metadata
@@ -27,7 +28,7 @@ module Fedora6
       end
 
       def save(binary_data, filename, transaction_uri: nil)
-        if exists? or tombstone?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary(config, uri, filename,
                                                            binary_data, transaction_uri: transaction_uri)
           validate_response(response, transaction_uri, config)

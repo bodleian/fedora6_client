@@ -62,17 +62,17 @@ RSpec.describe Fedora6::Client do
   end
 
   it "checks resources exist" do
-    container = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'good_file')
-    expect(container.exists?).to eq true
+    binary = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'good_file')
+    expect(binary.exists?).to eq true
   end
 
   it "fails to find resources that do not exist" do
-    container = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'unknown_file')
-    expect(container.exists?).to eq false
+    binary = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'unknown_file')
+    expect(binary.exists?).to eq false
   end
 
   it "has a tombstone checker" do
-    container = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'tombstoned_file')
-    expect(container.tombstone?).to eq true
+    binary = Fedora6::Client::Binary.new({ base: "https://test.com/base" }, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd', 'tombstoned_file')
+    expect(binary.tombstone?).to eq true
   end
 end
