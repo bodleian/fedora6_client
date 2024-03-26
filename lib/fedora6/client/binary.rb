@@ -10,13 +10,14 @@ module Fedora6
     EXTERNAL_CONTENT_REL = "rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
 
     class Binary < Client
-      attr_reader :config, :parent_uri, :binary_identifier, :uri
+      attr_reader :config, :parent_uri, :binary_identifier, :uri, :in_archival_group
 
-      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil)
+      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil, in_archival_group = true)
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
         @uri = parent_uri && binary_identifier ? "#{parent_uri}/#{binary_identifier}" : binary_uri
+        @in_archival_group = in_archival_group
       end
 
       def metadata
@@ -27,7 +28,7 @@ module Fedora6
       end
 
       def save(binary_data, filename, transaction_uri: nil)
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary(config, uri, filename,
                                                            binary_data, transaction_uri: transaction_uri)
           validate_response(response, transaction_uri, config)
@@ -41,7 +42,7 @@ module Fedora6
       end
 
       def save_by_reference(file_path, transaction_uri: nil)
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_reference(config, @uri,
                                                                         file_path, transaction_uri: transaction_uri)
           validate_response(response, transaction_uri, config)
@@ -55,7 +56,7 @@ module Fedora6
       end
 
       def save_by_stream(file_path, transaction_uri: nil, mime_type: "application/octet-stream")
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_stream(config, @uri, file_path,
                                                                      transaction_uri: transaction_uri,
                                                                      mime_type: mime_type)

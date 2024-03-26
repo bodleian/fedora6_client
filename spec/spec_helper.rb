@@ -113,6 +113,18 @@ RSpec.configure do |config|
     stub_request(:delete, "https://test.com/expired/fcr:tx/12345678")
       .to_return(status: 410, body: nil)
 
+    # Detect tombstone
+    stub_request(:head, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/tombstoned_file')
+      .to_return(status: 410, body: nil)
+
+    # Detect file exists
+    stub_request(:head, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/good_file')
+      .to_return(status: 200, body: nil)
+
+    # Detect file does not exist
+    stub_request(:head, 'https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/unknown_file')
+      .to_return(status: 404, body: nil)
+
     ### Version stubs
     stub_request(:get, "https://test.com/base/uuid_12345678-1234-1234-1234-12345678abcd/fcr:versions")
       .to_return(status: 200, body: versions_list)
