@@ -48,8 +48,14 @@ module Fedora6
       end
 
       def self.perform_request(config, uri, request_type)
+        read_timeout = 60
+        if request_type == 'Put'
+          # Transactions for large objects can take a long while
+          # to close, so set a read timeout to 30 minutes 
+          read_timeout = 1800
+        end
         url = URI.parse(uri)
-        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
+        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https", read_timeout: read_timeout) do |http|
           req = Object.const_get("Net::HTTP::#{request_type}").new(url)
           req.basic_auth(config[:user], config[:password])
           http.request(req)

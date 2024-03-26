@@ -73,6 +73,17 @@ module Fedora6
       end
     end
 
+    def tombstone?
+      # Test that an object has been tombstoned
+      response = head(config, uri)
+      if %w[410].include? response.code
+        true
+      else
+        false
+      end
+    end
+
+
     ### TODO: rewrite to detect child type. binary metadata uses get_binary_metadata
 
     def metadata
