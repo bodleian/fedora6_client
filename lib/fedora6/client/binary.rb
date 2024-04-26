@@ -10,13 +10,14 @@ module Fedora6
     EXTERNAL_CONTENT_REL = "rel=\"http://fedora.info/definitions/fcrepo#ExternalContent\"; handling=\"copy\"; type=\"application/octet-stream\""
 
     class Binary < Client
-      attr_reader :config, :parent_uri, :binary_identifier, :uri
+      attr_reader :config, :parent_uri, :binary_identifier, :uri, :in_archival_group
 
-      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil)
+      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil, in_archival_group = true)
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
         @uri = parent_uri && binary_identifier ? "#{parent_uri}/#{binary_identifier}" : binary_uri
+        @in_archival_group = in_archival_group
       end
 
       def metadata
@@ -27,9 +28,10 @@ module Fedora6
       end
 
       def save(binary_data, filename, transaction_uri: nil)
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary(config, uri, filename,
-                                                           binary_data, transaction_uri: transaction_uri)
+                                                           binary_data, transaction_uri: transaction_uri,
+                                                           overwrite_tombstone: tombstone?)
           validate_response(response, transaction_uri, config)
           true
         else
@@ -41,9 +43,10 @@ module Fedora6
       end
 
       def save_by_reference(file_path, transaction_uri: nil)
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_reference(config, @uri,
-                                                                        file_path, transaction_uri: transaction_uri)
+                                                                        file_path, transaction_uri: transaction_uri,
+                                                                        overwrite_tombstone: tombstone?)
           validate_response(response, transaction_uri, config)
           true
         else
@@ -55,10 +58,11 @@ module Fedora6
       end
 
       def save_by_stream(file_path, transaction_uri: nil, mime_type: "application/octet-stream")
-        if exists?
+        if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_stream(config, @uri, file_path,
                                                                      transaction_uri: transaction_uri,
-                                                                     mime_type: mime_type)
+                                                                     mime_type: mime_type,
+                                                                     overwrite_tombstone: tombstone?)
           validate_response(response, transaction_uri, config)
           true
         else
@@ -86,12 +90,13 @@ module Fedora6
         perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
-      def self.update_binary(config, binary_uri, filename, binary_data, transaction_uri: nil)
+      def self.update_binary(config, binary_uri, filename, binary_data, transaction_uri: nil, overwrite_tombstone: false)
         # update a file by sending a data binary
         args = {
           body: binary_data,
           transaction_uri: transaction_uri,
-          content_disposition: "attachment; filename=\"#{filename}\""
+          content_disposition: "attachment; filename=\"#{filename}\"",
+          overwrite_tombstone: overwrite_tombstone
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -108,11 +113,12 @@ module Fedora6
         perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
-      def self.update_binary_by_reference(config, binary_uri, file_path, transaction_uri: nil)
+      def self.update_binary_by_reference(config, binary_uri, file_path, transaction_uri: nil, overwrite_tombstone: false)
         # update a file by sending a data binary by reference
         args = {
           transaction_uri: transaction_uri,
-          link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
+          link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}",
+          overwrite_tombstone: overwrite_tombstone
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -130,12 +136,13 @@ module Fedora6
         perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
-      def self.update_binary_by_stream(config, binary_uri, file_path, transaction_uri: nil, mime_type: "application/octet-stream")
+      def self.update_binary_by_stream(config, binary_uri, file_path, transaction_uri: nil, mime_type: "application/octet-stream", overwrite_tombstone: false)
         # update a file by sending a data binary by reference
         args = {
           transaction_uri: transaction_uri,
           body_stream: file_path,
-          mime_type: mime_type
+          mime_type: mime_type,
+          overwrite_tombstone: overwrite_tombstone
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -158,6 +165,7 @@ module Fedora6
           req["Slug"] = args[:file_identifier] if args[:file_identifier]
           req["Atomic-ID"] = args[:transaction_uri] if args[:transaction_uri]
           req["Content-Disposition"] = args[:content_disposition] if args[:content_disposition]
+          req["Overwrite-Tombstone"] = args[:overwrite_tombstone].to_s if args[:overwrite_tombstone]
           http.request(req)
         end
       end
