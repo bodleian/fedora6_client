@@ -162,7 +162,7 @@ module Fedora6
           req["Slug"] = args[:file_identifier] if args[:file_identifier]
           req["Atomic-ID"] = args[:transaction_uri] if args[:transaction_uri]
           req["Content-Disposition"] = args[:content_disposition] if args[:content_disposition]
-          req["Overwrite-Tombstone"] = args[:overwrite_tombstone] if args[:overwrite_tombstone]
+          req["Overwrite-Tombstone"] = args[:overwrite_tombstone] if (args[:overwrite_tombstone] && tombstone?)
           http.request(req)
         end
       end
