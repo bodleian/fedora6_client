@@ -92,7 +92,8 @@ module Fedora6
         args = {
           body: binary_data,
           transaction_uri: transaction_uri,
-          content_disposition: "attachment; filename=\"#{filename}\""
+          content_disposition: "attachment; filename=\"#{filename}\"",
+          overwrite_tombstone: "true"
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -113,7 +114,8 @@ module Fedora6
         # update a file by sending a data binary by reference
         args = {
           transaction_uri: transaction_uri,
-          link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}"
+          link: "<file://#{file_path}>; #{EXTERNAL_CONTENT_REL}",
+          overwrite_tombstone: "true"
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -136,7 +138,8 @@ module Fedora6
         args = {
           transaction_uri: transaction_uri,
           body_stream: file_path,
-          mime_type: mime_type
+          mime_type: mime_type,
+          overwrite_tombstone: "true"
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -159,6 +162,7 @@ module Fedora6
           req["Slug"] = args[:file_identifier] if args[:file_identifier]
           req["Atomic-ID"] = args[:transaction_uri] if args[:transaction_uri]
           req["Content-Disposition"] = args[:content_disposition] if args[:content_disposition]
+          req["Overwrite-Tombstone"] = args[:overwrite_tombstone] if args[:overwrite_tombstone]
           http.request(req)
         end
       end
