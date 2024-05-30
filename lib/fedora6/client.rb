@@ -86,8 +86,8 @@ module Fedora6
 
     ### TODO: rewrite to detect child type. binary metadata uses get_binary_metadata
 
-    def metadata
-      response = get(@config, @uri)
+    def metadata(timestamp: nil)
+      response = get(@config, @uri, timestamp: timestamp)
       validate_response(response)
       json = JSON.parse(response.body)
       return json.first
@@ -111,8 +111,8 @@ module Fedora6
       versions.sort_by{|v| DateTime.parse(v.memento)}
     end
 
-    def children
-      object_metadata = metadata
+    def children(timestamp: nil)
+      object_metadata = metadata(timestamp: timestamp)
       children = object_metadata['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
       return children
     end
@@ -162,7 +162,7 @@ module Fedora6
       return false if timestamp.to_s.empty?
       
       datetime_object = DateTime.parse(timestamp.to_s)
-      datetime_object.strftime("%a, %d %b %Y %H:%M:%S %Z")
+      datetime_object.getgm.strftime("%a, %d %b %Y %H:%M:%S GMT")
     end
 
     def self.delete_object(config, uri, transaction_uri: nil)
