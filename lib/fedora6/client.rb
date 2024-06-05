@@ -98,6 +98,16 @@ module Fedora6
       return json.first
     end
 
+    def get_version_uri(timestamp:nil)
+      # Gets the current version URI for a versioned resource
+      response = head(@config, @uri)
+      if response.code == "302"
+        new_uri = response['Location']
+      else
+        @uri
+      end
+    end
+
     def new_version(transaction_uri: nil)
       response = Fedora6::Client::Version.create_version(config, uri, transaction_uri: transaction_uri)
       validate_response(response)
@@ -140,17 +150,22 @@ module Fedora6
       delete_tombstone(transaction_uri)
     end
 
-    def head(config, uri)
+    def head(config, uri, timestamp: nil)
+      fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Head.new url
         req.basic_auth(config[:user], config[:password])
+        req['Accept-Datetime'] = fedora_timestamp if fedora_timestamp
         http.request(req)
       end
     end
 
     def get(config, uri, timestamp: nil)
       fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
+      if fedora_timestamp
+        uri = get_version_uri(uri, timestamp: fedora_timestamp)
+      end
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Get.new url

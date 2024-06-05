@@ -172,6 +172,9 @@ module Fedora6
 
       def get(config, uri, file_path, timestamp: nil)
         fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
+        if fedora_timestamp
+          uri = get_version_uri(uri, timestamp: fedora_timestamp)
+        end
         url = URI.parse(uri.to_s)
         Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
           req = Net::HTTP::Get.new url
