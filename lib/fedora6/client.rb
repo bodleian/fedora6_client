@@ -91,7 +91,7 @@ module Fedora6
       # requests for versioned object metadata will often return 302
       # and the correct link will be in the response location
       if timestamp.present? && response.code == "302"
-        response = get(@config, @response['location'])
+        response = get(@config, response['location'])
       end
       validate_response(response)
       json = JSON.parse(response.body)
