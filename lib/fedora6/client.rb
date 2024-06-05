@@ -88,6 +88,11 @@ module Fedora6
 
     def metadata(timestamp: nil)
       response = get(@config, @uri, timestamp: timestamp)
+      # requests for versioned object metadata will often return 302
+      # and the correct link will be in the response location
+      if timestamp.present? && response.code == "302"
+        response = get(@config, @response['location'])
+      end
       validate_response(response)
       json = JSON.parse(response.body)
       return json.first
@@ -176,6 +181,7 @@ module Fedora6
     end
 
     def validate_response(response, transaction_uri = nil, config = nil)
+      # Calls to get object level versions return 302 responses
       return if %w[200 201 204].include? response.code
 
       raise Fedora6::APIError.new(response.code, response.body, transaction_uri, config)

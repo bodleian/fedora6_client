@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fedora6-client (0.1.0)
+    fedora6-client (1.1.0)
       byebug
       net-http-persistent
       rspec
@@ -66,9 +66,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  byebug
   fedora6-client!
-  json
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.21)
