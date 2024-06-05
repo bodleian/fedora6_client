@@ -100,7 +100,7 @@ module Fedora6
 
     def get_version_uri(uri, timestamp:nil)
       # Gets the current version URI for a versioned resource
-      response = head(@config, uri)
+      response = head(@config, uri, timestamp: timestamp)
       if response.code == "302"
         new_uri = response['Location']
       else
