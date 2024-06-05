@@ -98,13 +98,14 @@ module Fedora6
       return json.first
     end
 
-    def get_version_uri(timestamp:nil)
+    def get_version_uri(uri, timestamp:nil)
       # Gets the current version URI for a versioned resource
-      response = head(@config, @uri)
+      response = head(@config, uri)
       if response.code == "302"
         new_uri = response['Location']
       else
-        @uri
+        validate_response(response)
+        uri
       end
     end
 
