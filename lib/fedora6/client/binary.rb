@@ -20,9 +20,9 @@ module Fedora6
         @in_archival_group = in_archival_group
       end
 
-      def metadata
+      def metadata(timestamp: nil)
         metadata_uri = "#{uri}/fcr:metadata"
-        response = get(config, metadata_uri)
+        response = get(config, metadata_uri, timestamp: timestamp)
         json = JSON.parse(response.body)
         json.first
       end
@@ -169,6 +169,28 @@ module Fedora6
           http.request(req)
         end
       end
+
+      def get(config, uri, file_path, timestamp: nil)
+        fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
+        if fedora_timestamp
+          uri = get_version_uri(uri, timestamp: fedora_timestamp)
+        end
+        url = URI.parse(uri.to_s)
+        Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
+          req = Net::HTTP::Get.new url
+          req.basic_auth(config[:user], config[:password])
+          req['Accept-Datetime'] = fedora_timestamp if fedora_timestamp
+          http.request(req) do |res|
+            validate_response(res)
+            open(file_path, 'wb') do |f|
+              res.read_body do |chunk|
+                f.write chunk
+              end
+            end
+          end
+        end
+      end
+
     end
   end
 end

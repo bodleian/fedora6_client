@@ -86,11 +86,27 @@ module Fedora6
 
     ### TODO: rewrite to detect child type. binary metadata uses get_binary_metadata
 
-    def metadata
-      response = get(@config, @uri)
+    def metadata(timestamp: nil)
+      response = get(@config, @uri, timestamp: timestamp)
+      # requests for versioned object metadata will often return 302
+      # and the correct link will be in the response location
+      if timestamp.present? && response.code == "302"
+        response = get(@config, response['location'])
+      end
       validate_response(response)
       json = JSON.parse(response.body)
       return json.first
+    end
+
+    def get_version_uri(uri, timestamp:nil)
+      # Gets the current version URI for a versioned resource
+      response = head(@config, uri, timestamp: timestamp)
+      if response.code == "302"
+        new_uri = response['Location']
+      else
+        validate_response(response)
+        uri
+      end
     end
 
     def new_version(transaction_uri: nil)
@@ -111,8 +127,8 @@ module Fedora6
       versions.sort_by{|v| DateTime.parse(v.memento)}
     end
 
-    def children
-      object_metadata = metadata
+    def children(timestamp: nil)
+      object_metadata = metadata(timestamp: timestamp)
       children = object_metadata['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
       return children
     end
@@ -135,17 +151,22 @@ module Fedora6
       delete_tombstone(transaction_uri)
     end
 
-    def head(config, uri)
+    def head(config, uri, timestamp: nil)
+      fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Head.new url
         req.basic_auth(config[:user], config[:password])
+        req['Accept-Datetime'] = fedora_timestamp if fedora_timestamp
         http.request(req)
       end
     end
 
     def get(config, uri, timestamp: nil)
       fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
+      if fedora_timestamp
+        uri = get_version_uri(uri, timestamp: fedora_timestamp)
+      end
       url = URI.parse(uri.to_s)
       Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
         req = Net::HTTP::Get.new url
@@ -162,7 +183,7 @@ module Fedora6
       return false if timestamp.to_s.empty?
       
       datetime_object = DateTime.parse(timestamp.to_s)
-      datetime_object.strftime("%a, %d %b %Y %H:%M:%S %Z")
+      datetime_object.getgm.strftime("%a, %d %b %Y %H:%M:%S GMT")
     end
 
     def self.delete_object(config, uri, transaction_uri: nil)
@@ -176,6 +197,7 @@ module Fedora6
     end
 
     def validate_response(response, transaction_uri = nil, config = nil)
+      # Calls to get object level versions return 302 responses
       return if %w[200 201 204].include? response.code
 
       raise Fedora6::APIError.new(response.code, response.body, transaction_uri, config)
