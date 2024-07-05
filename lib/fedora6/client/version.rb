@@ -5,15 +5,16 @@ module Fedora6
     # Fedora6::Client::Version
     # Class for managing Fedora6 RDF Version(s)
     class Version < Client
-      attr_reader :config, :memento, :uri
+      attr_reader :config, :uri
+      attr_accessor :memento
 
       def initialize(config = nil, uri = nil)
         @config = Fedora6::Client::Config.new(config).config
         @uri = uri
-        @memento = memento
+        @memento = set_memento
       end
 
-      def memento
+      def set_memento
         # The only metadata we need here is in a header, a good thing, because
         # the get call to the version for a binary file downloads the file
         version_metadata = head(config, uri)
