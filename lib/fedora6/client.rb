@@ -84,8 +84,6 @@ module Fedora6
     end
 
 
-    ### TODO: rewrite to detect child type. binary metadata uses get_binary_metadata
-
     def metadata(timestamp: nil)
       response = get(@config, @uri, timestamp: timestamp)
       # requests for versioned object metadata will often return 302
@@ -121,16 +119,33 @@ module Fedora6
       validate_response(response)
       json_versions = JSON.parse(response.body).first
       version_uris = json_versions["http://www.w3.org/ns/ldp#contains"].map{|f| f['@id']}
-      versions = version_uris.map do |v|
-        Fedora6::Client::Version.new(@config, v)
+      versions = version_uris.map do | version_uri |
+        Fedora6::Client::Version.new(@config, version_uri)
       end
-      versions.sort_by{|v| DateTime.parse(v.memento)}
+      versions.map do | version |
+        # if the object has been tombstoned, the final version will have a blank memento
+        next if version.memento.present?
+        tombstone_memento = get_tombstone_memento
+        version.memento = Fedora6::Client.rfc1132_timestamp(tombstone_memento)
+      end
+      versions.sort_by{| version | DateTime.parse(version.memento)}
     end
 
     def children(timestamp: nil)
       object_metadata = metadata(timestamp: timestamp)
       children = object_metadata['http://www.w3.org/ns/ldp#contains'].map{|f| f['@id']}
       return children
+    end
+
+    def get_tombstone_memento
+      # Gets the tombstone memento from a tombstoned object
+      url = URI.parse(self.uri.to_s)
+      Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == "https") do |http|
+        req = Net::HTTP::Get.new url
+        req.basic_auth(self.config[:user], self.config[:password])
+        response = http.request(req)
+        response.body.to_s.gsub(/.* departed at: /, '')
+      end
     end
 
     def delete_tombstone(transaction_uri = nil)
