@@ -170,7 +170,7 @@ module Fedora6
         end
       end
 
-      def get(config, uri, file_path, timestamp: nil)
+      def get(config, uri, file_path=nil, timestamp: nil)
         fedora_timestamp = Fedora6::Client.rfc1132_timestamp(timestamp)
         if fedora_timestamp
           uri = get_version_uri(uri, timestamp: fedora_timestamp)
@@ -180,13 +180,19 @@ module Fedora6
           req = Net::HTTP::Get.new url
           req.basic_auth(config[:user], config[:password])
           req['Accept-Datetime'] = fedora_timestamp if fedora_timestamp
-          http.request(req) do |res|
-            validate_response(res)
-            open(file_path, 'wb') do |f|
-              res.read_body do |chunk|
-                f.write chunk
+          if file_path
+            http.request(req) do |res|
+              validate_response(res)
+              open(file_path, 'wb') do |f|
+                res.read_body do |chunk|
+                  f.write chunk
+                end
               end
             end
+          else
+            # We're asking for metadata relating to a binary file, so take the result directly
+            req['Accept'] = "application/ld+json"
+            http.request(req)
           end
         end
       end
