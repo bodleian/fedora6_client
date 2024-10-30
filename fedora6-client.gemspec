@@ -7,6 +7,7 @@ Gem::Specification.new do |spec|
   spec.version = Fedora6::Client::VERSION
   spec.authors = ["Tom Wrobel"]
   spec.email = ["thomas.wrobel@bodleian.ox.ac.uk"]
+  spec.version = "1.3.0"
 
   spec.summary = "A Fedora6 API client"
   spec.description = "Rails gem for interaction with the Fedora6 repository system"
