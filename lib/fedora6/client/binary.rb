@@ -12,12 +12,13 @@ module Fedora6
     class Binary < Client
       attr_reader :config, :parent_uri, :binary_identifier, :uri, :in_archival_group
 
-      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil, in_archival_group = true)
+      def initialize(config = nil, parent_uri = nil, binary_identifier = nil, binary_uri = nil, in_archival_group = true, mime_type = nil)
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
         @uri = parent_uri && binary_identifier ? "#{parent_uri}/#{binary_identifier}" : binary_uri
         @in_archival_group = in_archival_group
+        @mime_type = mime_type || "application/octet-stream"
       end
 
       def metadata(timestamp: nil)
@@ -27,16 +28,18 @@ module Fedora6
         json.first
       end
 
-      def save(binary_data, filename, transaction_uri: nil)
+      def save(binary_data, filename, transaction_uri: nil, mime_type: nil)
+        mime_type ||= @mime_type
         if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary(config, uri, filename,
                                                            binary_data, transaction_uri: transaction_uri,
-                                                           overwrite_tombstone: tombstone?)
+                                                           overwrite_tombstone: tombstone?, mime_type: mime_type)
           validate_response(response, transaction_uri, config)
           true
         else
           response = Fedora6::Client::Binary.create_binary(config, parent_uri, binary_identifier,
-                                                           filename, binary_data, transaction_uri: transaction_uri)
+                                                           filename, binary_data, transaction_uri: transaction_uri,
+                                                           mime_type: mime_type)
           validate_response(response, transaction_uri, config)
           @uri = response.body
         end
@@ -57,7 +60,8 @@ module Fedora6
         end
       end
 
-      def save_by_stream(file_path, transaction_uri: nil, mime_type: "application/octet-stream")
+      def save_by_stream(file_path, transaction_uri: nil, mime_type: nil)
+        mime_type ||= @mime_type
         if exists? or (tombstone? and in_archival_group)
           response = Fedora6::Client::Binary.update_binary_by_stream(config, @uri, file_path,
                                                                      transaction_uri: transaction_uri,
@@ -77,26 +81,28 @@ module Fedora6
 
       # Class methods
 
-      def self.create_binary(config, parent_uri, file_identifier, filename, binary_data, transaction_uri: nil)
+      def self.create_binary(config, parent_uri, file_identifier, filename, binary_data, transaction_uri: nil, mime_type: "application/octet-stream")
         # upload a file by sending a data binary
 
         args = {
           body: binary_data,
           file_identifier: file_identifier,
           transaction_uri: transaction_uri,
-          content_disposition: "attachment; filename=\"#{filename}\""
+          content_disposition: "attachment; filename=\"#{filename}\"",
+          mime_type: mime_type
         }
 
         perform_request(config, parent_uri, Net::HTTP::Post, args)
       end
 
-      def self.update_binary(config, binary_uri, filename, binary_data, transaction_uri: nil, overwrite_tombstone: false)
+      def self.update_binary(config, binary_uri, filename, binary_data, transaction_uri: nil, overwrite_tombstone: false, mime_type: "application/octet-stream")
         # update a file by sending a data binary
         args = {
           body: binary_data,
           transaction_uri: transaction_uri,
           content_disposition: "attachment; filename=\"#{filename}\"",
-          overwrite_tombstone: overwrite_tombstone
+          overwrite_tombstone: overwrite_tombstone,
+          mime_type: mime_type
         }
 
         perform_request(config, binary_uri, Net::HTTP::Put, args)
@@ -155,6 +161,7 @@ module Fedora6
           req.basic_auth(config[:user], config[:password])
           if args[:body]
             req.body = args[:body]
+            req.content_type = args[:mime_type] ? args[:mime_type] : "application/octet-stream"
           elsif args[:body_stream] and File.exists?(args[:body_stream])
             req.body_stream = File.open(args[:body_stream])
             req.content_length = File.size(args[:body_stream])

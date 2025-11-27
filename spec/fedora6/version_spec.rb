@@ -4,6 +4,7 @@
 ModifiedBy\":[{\"@value\":\"ora\"}],\"http://mementoweb.org/ns#original\":[{\"@id\":\"https://ora4-qa-dps-witness.bodleian.ox.ac.uk/fcrepo/rest/uuid_e029104a-fced-49c9-b038-147bd62068bf\"}],\"http://fedora.info/definitions/v4/repository#createdBy\":[{\"@value\":\"ora\"}],\"http://fedora.info/definitions/v4/repository#created\":[{\"@value\":\"2023-04-28T13:59:02.467364Z\",\"@type\":\"http://www.w3.org/2001/XMLSchema#dateTime\"}],\"http://fedora.info/definitions/v4/repository#lastModified\":[{\"@value\":\"2023-04-28T13:59:02.467364Z\",\"@type\":\"http://www.w3.org/2001/XMLSchema#dateTime\"}]}]\n"
 
 # frozen_string_literal: true
+require "fedora6/client"
 
 RSpec.describe Fedora6::Client::Version do
     it "has get method" do
