@@ -16,7 +16,7 @@ module Fedora6
         @config = Fedora6::Client::Config.new(config).config
         @parent_uri = parent_uri
         @binary_identifier = binary_identifier
-        @uri = parent_uri && binary_identifier ? "#{parent_uri}/#{binary_identifier}" : binary_uri
+        @uri = binary_uri ? binary_uri : "#{parent_uri}/#{binary_identifier}"
         @in_archival_group = in_archival_group
         @mime_type = mime_type || "application/octet-stream"
       end
