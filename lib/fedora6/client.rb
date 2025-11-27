@@ -88,7 +88,7 @@ module Fedora6
       response = get(@config, @uri, timestamp: timestamp)
       # requests for versioned object metadata will often return 302
       # and the correct link will be in the response location
-      if timestamp.present? && response.code == "302"
+      if timestamp && (timestamp != '') && response.code == "302"
         response = get(@config, response['location'])
       end
       validate_response(response)
@@ -124,7 +124,7 @@ module Fedora6
       end
       versions.map do | version |
         # if the object has been tombstoned, the final version will have a blank memento
-        next if version.memento.present?
+        next if version.memento && version.memento != ''
         tombstone_memento = get_tombstone_memento
         version.memento = Fedora6::Client.rfc1132_timestamp(tombstone_memento)
       end
@@ -198,7 +198,7 @@ module Fedora6
       return false if timestamp.to_s.empty?
       
       datetime_object = DateTime.parse(timestamp.to_s)
-      datetime_object.getgm.strftime("%a, %d %b %Y %H:%M:%S GMT")
+      datetime_object.to_time.httpdate
     end
 
     def self.delete_object(config, uri, transaction_uri: nil)

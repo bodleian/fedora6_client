@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'date'
+require "fedora6/client"
+
 
 RSpec.describe Fedora6::Client do
   it "has a Version" do
@@ -39,7 +41,7 @@ RSpec.describe Fedora6::Client do
 
   it "parses dates" do 
     input_date = "2022-05-05T13:50"
-    expected_date_string = "Thu, 05 May 2022 13:50:00 +00:00"
+    expected_date_string = "Thu, 05 May 2022 13:50:00 GMT"
     datetime_object = DateTime.parse(input_date)
     # Test both strings and DateTime objects
     [input_date, datetime_object].map do |d|

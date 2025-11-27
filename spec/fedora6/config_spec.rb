@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "fedora6/client"
 
 RSpec.describe Fedora6::Client::Config do
   it "it has configuration" do
